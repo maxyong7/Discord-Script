@@ -8,9 +8,9 @@ import psycopg2.extras
 import time
 import aiohttp
 
-cmd_input = 961004579712012418
-cmd_logs = 961005815098142770
-cmd_post = 961004419430879232
+cmd_input = os.environ["cmd_input"]
+cmd_logs = os.environ["cmd_logs"]
+cmd_post = os.environ["cmd_post"]
 empty_list = []
 # Giveaways
 giveaway_words_not_to_join = ["entrants", "congratulations"]
@@ -37,12 +37,12 @@ all_input = "*"
 discord_acc_table = "discord_acc"
 acc_discord_id = "discord_id"
 acc_letters = "letters"
-#Webhook
+# Webhook
 join_webhook_name = os.environ["join_webhook_name"]
 won_webhook_name = os.environ["won_webhook_name"]
 join_webhook_url = os.environ["webhook_url"]
 won_webhook_url = os.environ["won_webhook_url"]
-#Channels
+# Channels
 won_channel = os.environ["won_giveaway_channel_id"]
 
 
@@ -60,6 +60,22 @@ client = discord.Client()
 
 async def leave(user, guild_id):
     await guild_id.leave()
+
+
+async def create_table():
+    with conn:
+        try:
+            c.execute(
+                f"""
+            CREATE TABLE {exclude_guild_id}(g BIGINT)
+            CREATE TABLE {exclude_words}(w VARCHAR)
+            CREATE TABLE {leave_guild_id}(l BIGINT);
+            CREATE TABLE {exclude_channel_id}(c BIGINT);
+            """
+            )
+            return [exclude_guild_id, exclude_words, leave_guild_id, exclude_channel_id]
+        except:
+            return False
 
 
 async def remove(msg, what):
@@ -259,7 +275,8 @@ async def giveaway_react(
                             )
                             async with aiohttp.ClientSession() as session:
                                 webhook = Webhook.from_url(
-                                    join_webhook_url, adapter=AsyncWebhookAdapter(session)
+                                    join_webhook_url,
+                                    adapter=AsyncWebhookAdapter(session),
                                 )
                                 await webhook.send(
                                     f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}",
@@ -275,7 +292,8 @@ async def giveaway_react(
                             giveaway_kw = embed.split("'")[1]
                             async with aiohttp.ClientSession() as session:
                                 webhook = Webhook.from_url(
-                                    join_webhook_url, adapter=AsyncWebhookAdapter(session)
+                                    join_webhook_url,
+                                    adapter=AsyncWebhookAdapter(session),
                                 )
                                 await webhook.send(
                                     f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}",
@@ -421,7 +439,7 @@ async def giveaway_react(
             )
             await webhook.send(
                 f"> You won giveaway from **{guild_name}**({msg_channel_name}) \n> {message.jump_url}",
-                username= won_webhook_name,
+                username=won_webhook_name,
             )
 
 
@@ -532,14 +550,16 @@ async def on_message(message):
     if message.author.id == Rumble_Royale:
         if client.user.mentioned_in(message):
             target_channel = client.get_channel(int(cmd_post))
-            await target_channel.send(f"> You won Rumble from {guild_name} ({channel_name}):\n{message.jump_url}")
+            await target_channel.send(
+                f"> You won Rumble from {guild_name} ({channel_name}):\n{message.jump_url}"
+            )
             async with aiohttp.ClientSession() as session:
                 webhook = Webhook.from_url(
                     won_webhook_url, adapter=AsyncWebhookAdapter(session)
                 )
                 await webhook.send(
                     f"> You won Rumble from {guild_name} ({channel_name}):\n{message.jump_url}",
-                    username= won_webhook_name,
+                    username=won_webhook_name,
                 )
 
     if message.channel.id == int(cmd_input) and msg.startswith("+"):
@@ -802,6 +822,17 @@ async def on_message(message):
         await target_channel.send(f"> Left {dictionary}")
         await target_channel.send(f"> {empty_string}")
 
+    if message.channel.id == int(cmd_input) and msg.startswith("!table"):
+        table_check = await create_table()
+        if table_check:
+            target_channel = client.get_channel(int(cmd_input))
+            await target_channel.send(f"Created Table: {table_check}")
+        else:
+            target_channel = client.get_channel(int(cmd_input))
+            await target_channel.send(
+                f"Failed to create table (Probably table ady existed"
+            )
+
 
 @client.event
 # Rumble Royale Auto React (Working)
@@ -837,11 +868,12 @@ async def on_reaction_add(reaction, user):
                             )
                             async with aiohttp.ClientSession() as session:
                                 webhook = Webhook.from_url(
-                                    join_webhook_url, adapter=AsyncWebhookAdapter(session)
+                                    join_webhook_url,
+                                    adapter=AsyncWebhookAdapter(session),
                                 )
                                 await webhook.send(
                                     f"> You joined Rumble from {guild_name} ({channel_name}):\n{messages.jump_url}",
-                                    username= join_webhook_name,
+                                    username=join_webhook_name,
                                 )
                             await rumble_msg.add_reaction("✅")
                             check = (
