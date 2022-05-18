@@ -1,2 +1,2 @@
 heroku ps:scale worker=1
-users_worker: for_others.py
+users_worker: python for_others.py
