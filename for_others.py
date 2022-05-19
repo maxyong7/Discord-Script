@@ -69,7 +69,7 @@ async def create_table():
                 f"""
             CREATE TABLE {exclude_guild_id}(g BIGINT)
             CREATE TABLE {exclude_words}(w VARCHAR)
-            CREATE TABLE {leave_guild_id}(l BIGINT);
+            CREATE TABLE {leave_guild_id}(l BIGINT)
             CREATE TABLE {exclude_channel_id}(c BIGINT);
             """
             )
@@ -568,7 +568,7 @@ async def on_message(message):
         id_letters = msg.split()[1]
 
         if what.lower() == words:
-            if any(id_letters.lower() in identify_list):
+            if (id_letters.lower() in identify_list):
                 while i < len(
                     split_msg
                 ):  # While loop (Add everything after the 3rd word to a list)
@@ -582,7 +582,7 @@ async def on_message(message):
                 # await target_channel.send(f"> Added {dictionary} to {exclude_words}")
 
         if what.lower() == guild_id:
-            if any(id_letters.lower() in identify_list):
+            if (id_letters.lower() in identify_list):
                 while i < len(
                     split_msg
                 ):  # While loop (Add everything after the 3rd word to a list)
@@ -597,7 +597,7 @@ async def on_message(message):
                 # await target_channel.send(f"> Added {dictionary} to {exclude_guild_id}")
 
         if what.lower() == channel_id:
-            if any(id_letters.lower() in identify_list):
+            if (id_letters.lower() in identify_list):
                 while i < len(
                     split_msg
                 ):  # While loop (Add everything after the 3rd word to a list)
@@ -612,7 +612,7 @@ async def on_message(message):
                 # await target_channel.send(f"> Added {dictionary} to {exclude_channel_id}")
 
         if what.lower() == leave_id:
-            if any(id_letters.lower() in identify_list):
+            if (id_letters.lower() in identify_list):
                 while i < len(
                     split_msg
                 ):  # While loop (Add everything after the 3rd word to a list)
@@ -627,7 +627,7 @@ async def on_message(message):
                 # await target_channel.send(f"> Added {dictionary} to {leave_guild_id}")
 
         target_channel = client.get_channel(int(cmd_input))
-        if any(id_letters.lower() in identify_list):
+        if (id_letters.lower() in identify_list):
             if bool(false_dictionary) == False:
                 await target_channel.send(f"> Added {dictionary}")
             elif bool(dictionary) == True and bool(false_dictionary) == True:
@@ -649,7 +649,7 @@ async def on_message(message):
         all_checker = msg.split()[2]
 
         if what.lower() == words:
-            if any(id_letters.lower() in identify_list):
+            if (id_letters.lower() in identify_list):
                 if all_checker == all_input:
                     dictionary = await fetch(id_letters, what)
                     await remove(all_input, what)
@@ -666,7 +666,7 @@ async def on_message(message):
                         i += 1
 
         if what.lower() == guild_id:
-            if any(id_letters.lower() in identify_list):
+            if (id_letters.lower() in identify_list):
                 if all_checker == all_input:
                     all_list = await fetch(id_letters, what)
                     for i in all_list:
@@ -687,7 +687,7 @@ async def on_message(message):
                         i += 1
 
         if what.lower() == channel_id:
-            if any(id_letters.lower() in identify_list):
+            if (id_letters.lower() in identify_list):
                 if all_checker == all_input:
                     all_list = await fetch(id_letters, what)
                     for i in all_list:
@@ -708,7 +708,7 @@ async def on_message(message):
                         i += 1
 
         if what.lower() == leave_id:
-            if any(id_letters.lower() in identify_list):
+            if (id_letters.lower() in identify_list):
                 if all_checker == all_input:
                     all_list = await fetch(id_letters, what)
                     for i in all_list:
@@ -729,7 +729,7 @@ async def on_message(message):
                         i += 1
 
         target_channel = client.get_channel(int(cmd_input))
-        if any(id_letters.lower() in identify_list):
+        if (id_letters.lower() in identify_list):
             if bool(false_dictionary) == False:
                 await target_channel.send(f"> Removed {dictionary}")
             elif bool(dictionary) == True and bool(false_dictionary) == True:
