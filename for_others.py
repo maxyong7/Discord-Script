@@ -257,176 +257,174 @@ async def giveaway_react(
         word_list = await fetch(identify_letters, words)
         guild_list = await fetch(identify_letters, guild_id)
         channel_list = await fetch(identify_letters, channel_id)
-        id = await fetch(identify_letters, acc_discord_id)
-        if user in id:
-            # Check exception_guild_id and exclude_guild_id from json before joining
-            if (react_guild_id not in guild_list) and (msg_channel not in channel_list):
-                # Check word_list in json before joining
-                if not any(word in embed.lower() for word in word_list):
-                    if not any(
-                        word in msg.lower() for word in giveaway_words_not_to_join
-                    ):
-                        time_checker = time.time() + 2.5
-                        asyncio.sleep(1)
-                        if bot_id == Giveaway_Boat_id:
-                            split = {embed.split("'")[0]}
-                            await_msg = await channel.send(
-                                f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
-                            )
-                            async with aiohttp.ClientSession() as session:
-                                webhook = Webhook.from_url(
-                                    join_webhook_url,
-                                    adapter=AsyncWebhookAdapter(session),
-                                )
-                                await webhook.send(
-                                    f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}",
-                                    username=join_webhook_name,
-                                )
-                            giveaway_kw = embed.split("'")[0]
-                            pass
-                        elif bot_id == GiveawayBot_id:
-                            split = embed.split("'")[1]
-                            await_msg = await channel.send(
-                                f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
-                            )
-                            giveaway_kw = embed.split("'")[1]
-                            async with aiohttp.ClientSession() as session:
-                                webhook = Webhook.from_url(
-                                    join_webhook_url,
-                                    adapter=AsyncWebhookAdapter(session),
-                                )
-                                await webhook.send(
-                                    f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}",
-                                    username=join_webhook_name,
-                                )
-                            pass
-
-                        await await_msg.add_reaction("✅")
-
-                        check1 = (
-                            lambda r, u: r.message.id == await_msg.id
-                            and u == await_msg.author
-                            and str(r.emoji) in "✅"
+        # Check exception_guild_id and exclude_guild_id from json before joining
+        if (react_guild_id not in guild_list) and (msg_channel not in channel_list):
+            # Check word_list in json before joining
+            if not any(word in embed.lower() for word in word_list):
+                if not any(
+                    word in msg.lower() for word in giveaway_words_not_to_join
+                ):
+                    time_checker = time.time() + 2.5
+                    asyncio.sleep(1)
+                    if bot_id == Giveaway_Boat_id:
+                        split = {embed.split("'")[0]}
+                        await_msg = await channel.send(
+                            f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
                         )
-                        check2 = (
-                            lambda m: m.channel == await_msg.channel
-                            and m.content.lower() == "yes"
-                        )  # working
-                        check3 = lambda c: c.channel == message.channel and any(
-                            word in c.content.lower() for word in word_list
-                        )
-                        check4 = (
-                            lambda r, u: r.message.id == await_msg.id
-                            and u != await_msg.author
-                            and str(r.emoji) in "✅"
-                        )
-
-                        while (time_checker + 0.5) > time.time():
-                            if time.time() >= time_checker:
-                                reaction = await message.add_reaction(
-                                    "\N{PARTY POPPER}"
-                                )
-                                break
-
-                        while True:
-                            if time.time() > time_checker:
-                                await asyncio.sleep(2.5)
-                                reaction = await message.add_reaction(
-                                    "\N{PARTY POPPER}"
-                                )
-                            tasks = [
-                                asyncio.create_task(
-                                    client.wait_for(
-                                        "reaction_remove", check=check1, timeout=60
-                                    ),
-                                    name="check_reaction_remove",
-                                ),
-                                asyncio.create_task(
-                                    client.wait_for(
-                                        "message", check=check2, timeout=60
-                                    ),
-                                    name="check_msg",
-                                ),
-                                asyncio.create_task(
-                                    client.wait_for(
-                                        "message", check=check3, timeout=60
-                                    ),
-                                    name="msg_scanner",
-                                ),
-                                asyncio.create_task(
-                                    client.wait_for(
-                                        "reaction_add", check=check4, timeout=60
-                                    ),
-                                    name="check_reaction_add",
-                                ),
-                            ]
-
-                            done, pending = await asyncio.wait(
-                                tasks,
-                                return_when=(
-                                    asyncio.FIRST_COMPLETED or asyncio.FIRST_EXCEPTION
-                                ),
+                        async with aiohttp.ClientSession() as session:
+                            webhook = Webhook.from_url(
+                                join_webhook_url,
+                                adapter=AsyncWebhookAdapter(session),
                             )
+                            await webhook.send(
+                                f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}",
+                                username=join_webhook_name,
+                            )
+                        giveaway_kw = embed.split("'")[0]
+                        pass
+                    elif bot_id == GiveawayBot_id:
+                        split = embed.split("'")[1]
+                        await_msg = await channel.send(
+                            f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
+                        )
+                        giveaway_kw = embed.split("'")[1]
+                        async with aiohttp.ClientSession() as session:
+                            webhook = Webhook.from_url(
+                                join_webhook_url,
+                                adapter=AsyncWebhookAdapter(session),
+                            )
+                            await webhook.send(
+                                f"> Joined giveaway **{split}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}",
+                                username=join_webhook_name,
+                            )
+                        pass
 
-                            finished: asyncio.Task = list(done)[0]
+                    await await_msg.add_reaction("✅")
 
-                            for task in tasks:
-                                try:
-                                    task.cancel()
-                                except asyncio.TimeoutError:
-                                    await await_msg.edit(
-                                        content=f" Giveaway unreact timed out. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
-                                    )
-                                    return
-                                except:
-                                    return
+                    check1 = (
+                        lambda r, u: r.message.id == await_msg.id
+                        and u == await_msg.author
+                        and str(r.emoji) in "✅"
+                    )
+                    check2 = (
+                        lambda m: m.channel == await_msg.channel
+                        and m.content.lower() == "yes"
+                    )  # working
+                    check3 = lambda c: c.channel == message.channel and any(
+                        word in c.content.lower() for word in word_list
+                    )
+                    check4 = (
+                        lambda r, u: r.message.id == await_msg.id
+                        and u != await_msg.author
+                        and str(r.emoji) in "✅"
+                    )
 
+                    while (time_checker + 0.5) > time.time():
+                        if time.time() >= time_checker:
+                            reaction = await message.add_reaction(
+                                "\N{PARTY POPPER}"
+                            )
+                            break
+
+                    while True:
+                        if time.time() > time_checker:
+                            await asyncio.sleep(2.5)
+                            reaction = await message.add_reaction(
+                                "\N{PARTY POPPER}"
+                            )
+                        tasks = [
+                            asyncio.create_task(
+                                client.wait_for(
+                                    "reaction_remove", check=check1, timeout=60
+                                ),
+                                name="check_reaction_remove",
+                            ),
+                            asyncio.create_task(
+                                client.wait_for(
+                                    "message", check=check2, timeout=60
+                                ),
+                                name="check_msg",
+                            ),
+                            asyncio.create_task(
+                                client.wait_for(
+                                    "message", check=check3, timeout=60
+                                ),
+                                name="msg_scanner",
+                            ),
+                            asyncio.create_task(
+                                client.wait_for(
+                                    "reaction_add", check=check4, timeout=60
+                                ),
+                                name="check_reaction_add",
+                            ),
+                        ]
+
+                        done, pending = await asyncio.wait(
+                            tasks,
+                            return_when=(
+                                asyncio.FIRST_COMPLETED or asyncio.FIRST_EXCEPTION
+                            ),
+                        )
+
+                        finished: asyncio.Task = list(done)[0]
+
+                        for task in tasks:
                             try:
-                                action = finished.get_name()
-                                result = finished.result()
+                                task.cancel()
                             except asyncio.TimeoutError:
                                 await await_msg.edit(
-                                    content=f"> Giveaway unreact timed out. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
+                                    content=f" Giveaway unreact timed out. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
                                 )
                                 return
                             except:
                                 return
 
-                            if action == "check_msg":
-                                await await_msg.edit(
-                                    content=f"> Unreacted via 'yes'. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
-                                )
-                                await message.remove_reaction(
-                                    "\N{PARTY POPPER}", client.user
-                                )
-                                break
+                        try:
+                            action = finished.get_name()
+                            result = finished.result()
+                        except asyncio.TimeoutError:
+                            await await_msg.edit(
+                                content=f"> Giveaway unreact timed out. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
+                            )
+                            return
+                        except:
+                            return
 
-                            elif action == "check_reaction_remove":
-                                await await_msg.edit(
-                                    content=f"> Unreacted via removing emoji. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
-                                )
-                                await message.remove_reaction(
-                                    "\N{PARTY POPPER}", client.user
-                                )
-                                break
+                        if action == "check_msg":
+                            await await_msg.edit(
+                                content=f"> Unreacted via 'yes'. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
+                            )
+                            await message.remove_reaction(
+                                "\N{PARTY POPPER}", client.user
+                            )
+                            break
 
-                            elif action == "msg_scanner":
-                                await asyncio.sleep(0.5)
-                                await channel.send(
-                                    f"> Potential fake giveaway **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url} <@&961002892897185862>"
-                                )
+                        elif action == "check_reaction_remove":
+                            await await_msg.edit(
+                                content=f"> Unreacted via removing emoji. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
+                            )
+                            await message.remove_reaction(
+                                "\N{PARTY POPPER}", client.user
+                            )
+                            break
 
-                            elif action == "check_reaction_add":
-                                await await_msg.edit(
-                                    content=f"> Unreacted via add emoji. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
-                                )
-                                await message.remove_reaction(
-                                    "\N{PARTY POPPER}", client.user
-                                )
-                                break
+                        elif action == "msg_scanner":
+                            await asyncio.sleep(0.5)
+                            await channel.send(
+                                f"> Potential fake giveaway **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url} <@&961002892897185862>"
+                            )
 
-                else:
-                    pass
+                        elif action == "check_reaction_add":
+                            await await_msg.edit(
+                                content=f"> Unreacted via add emoji. **{giveaway_kw}** - {guild_name} ({msg_channel_name}) :\n> {message.jump_url}"
+                            )
+                            await message.remove_reaction(
+                                "\N{PARTY POPPER}", client.user
+                            )
+                            break
+
+            else:
+                pass
 
     if client.user.mentioned_in(message):
         target_channel = client.get_channel(int(won_channel))
@@ -847,105 +845,92 @@ async def on_reaction_add(reaction, user):
         word_list = await fetch(identify_letters, words)
         guild_list = await fetch(identify_letters, guild_id)
         channel_list = await fetch(identify_letters, channel_id)
-        id = await fetch(identify_letters, acc_discord_id)
-
-        if str(client.user.id) in id:
-            # Check exception_guild_id and exclude_guild_id from json before joining
-            if (
-                reaction_guild_id not in guild_list
-                and reaction_channel_id not in channel_list
-            ):
-                await asyncio.sleep(20)
-                rumble_emoji = reaction.emoji
-                if asyncio.sleep:
-                    try:
-                        await messages.add_reaction(reaction.emoji)
-                        if messages.add_reaction:
-                            asyncio.sleep(1)
-                            target_channel = client.get_channel(int(cmd_post))
-                            rumble_msg = await target_channel.send(
-                                f"> You joined Rumble from {guild_name} ({channel_name}):\n{messages.jump_url}"
+        
+        # Check exception_guild_id and exclude_guild_id from json before joining
+        if (
+            reaction_guild_id not in guild_list
+            and reaction_channel_id not in channel_list
+        ):
+            await asyncio.sleep(20)
+            rumble_emoji = reaction.emoji
+            if asyncio.sleep:
+                try:
+                    await messages.add_reaction(reaction.emoji)
+                    if messages.add_reaction:
+                        asyncio.sleep(1)
+                        target_channel = client.get_channel(int(cmd_post))
+                        rumble_msg = await target_channel.send(
+                            f"> You joined Rumble from {guild_name} ({channel_name}):\n{messages.jump_url}"
+                        )
+                        async with aiohttp.ClientSession() as session:
+                            webhook = Webhook.from_url(
+                                join_webhook_url,
+                                adapter=AsyncWebhookAdapter(session),
                             )
-                            async with aiohttp.ClientSession() as session:
-                                webhook = Webhook.from_url(
-                                    join_webhook_url,
-                                    adapter=AsyncWebhookAdapter(session),
-                                )
-                                await webhook.send(
-                                    f"> You joined Rumble from {guild_name} ({channel_name}):\n{messages.jump_url}",
-                                    username=join_webhook_name,
-                                )
-                            await rumble_msg.add_reaction("✅")
-                            check = (
-                                lambda r, u: r.message.id == rumble_msg.id
-                                and u == rumble_msg.author
-                                and str(r.emoji) in "✅"
+                            await webhook.send(
+                                f"> You joined Rumble from {guild_name} ({channel_name}):\n{messages.jump_url}",
+                                username=join_webhook_name,
                             )
-                            check2 = (
-                                lambda m: m.channel == rumble_msg.channel
-                                and m.content.lower() == "yes"
-                            )  # working
-                            check3 = lambda c: c.channel == messages.channel and any(
-                                word in c.content.lower() for word in word_list
+                        await rumble_msg.add_reaction("✅")
+                        check = (
+                            lambda r, u: r.message.id == rumble_msg.id
+                            and u == rumble_msg.author
+                            and str(r.emoji) in "✅"
+                        )
+                        check2 = (
+                            lambda m: m.channel == rumble_msg.channel
+                            and m.content.lower() == "yes"
+                        )  # working
+                        check3 = lambda c: c.channel == messages.channel and any(
+                            word in c.content.lower() for word in word_list
+                        )
+                        check4 = (
+                            lambda r, u: r.message.id == rumble_msg.id
+                            and u != rumble_msg.author
+                            and str(r.emoji) in "✅"
+                        )
+
+                        while True:
+                            tasks = [
+                                asyncio.create_task(
+                                    client.wait_for(
+                                        "reaction_remove", check=check, timeout=60
+                                    ),
+                                    name="check_reaction_remove",
+                                ),
+                                asyncio.create_task(
+                                    client.wait_for(
+                                        "message", check=check2, timeout=60
+                                    ),
+                                    name="check_msg",
+                                ),
+                                asyncio.create_task(
+                                    client.wait_for(
+                                        "message", check=check3, timeout=60
+                                    ),
+                                    name="msg_scanner",
+                                ),
+                                asyncio.create_task(
+                                    client.wait_for(
+                                        "reaction_add", check=check4, timeout=60
+                                    ),
+                                    name="check_reaction_add",
+                                ),
+                            ]
+
+                            done, pending = await asyncio.wait(
+                                tasks,
+                                return_when=(
+                                    asyncio.FIRST_COMPLETED
+                                    or asyncio.FIRST_EXCEPTION
+                                ),
                             )
-                            check4 = (
-                                lambda r, u: r.message.id == rumble_msg.id
-                                and u != rumble_msg.author
-                                and str(r.emoji) in "✅"
-                            )
 
-                            while True:
-                                tasks = [
-                                    asyncio.create_task(
-                                        client.wait_for(
-                                            "reaction_remove", check=check, timeout=60
-                                        ),
-                                        name="check_reaction_remove",
-                                    ),
-                                    asyncio.create_task(
-                                        client.wait_for(
-                                            "message", check=check2, timeout=60
-                                        ),
-                                        name="check_msg",
-                                    ),
-                                    asyncio.create_task(
-                                        client.wait_for(
-                                            "message", check=check3, timeout=60
-                                        ),
-                                        name="msg_scanner",
-                                    ),
-                                    asyncio.create_task(
-                                        client.wait_for(
-                                            "reaction_add", check=check4, timeout=60
-                                        ),
-                                        name="check_reaction_add",
-                                    ),
-                                ]
+                            finished: asyncio.Task = list(done)[0]
 
-                                done, pending = await asyncio.wait(
-                                    tasks,
-                                    return_when=(
-                                        asyncio.FIRST_COMPLETED
-                                        or asyncio.FIRST_EXCEPTION
-                                    ),
-                                )
-
-                                finished: asyncio.Task = list(done)[0]
-
-                                for task in tasks:
-                                    try:
-                                        task.cancel()
-                                    except asyncio.TimeoutError:
-                                        await rumble_msg.edit(
-                                            content=f"> You joined Rumble from {guild_name} ({channel_name}):\n> {messages.jump_url} (too late to unreact)"
-                                        )
-                                        return
-                                    except:
-                                        return
-
+                            for task in tasks:
                                 try:
-                                    action = finished.get_name()
-                                    result = finished.result()
+                                    task.cancel()
                                 except asyncio.TimeoutError:
                                     await rumble_msg.edit(
                                         content=f"> You joined Rumble from {guild_name} ({channel_name}):\n> {messages.jump_url} (too late to unreact)"
@@ -954,34 +939,45 @@ async def on_reaction_add(reaction, user):
                                 except:
                                     return
 
-                                if action == "check_msg":
-                                    await rumble_msg.edit(
-                                        content=f"> Unreacted rumble via 'yes' from {guild_name} ({channel_name}):\n> {messages.jump_url}"
-                                    )
-                                    await reaction.remove(client.user)
-                                    break
+                            try:
+                                action = finished.get_name()
+                                result = finished.result()
+                            except asyncio.TimeoutError:
+                                await rumble_msg.edit(
+                                    content=f"> You joined Rumble from {guild_name} ({channel_name}):\n> {messages.jump_url} (too late to unreact)"
+                                )
+                                return
+                            except:
+                                return
 
-                                elif action == "check_reaction_remove":
-                                    await rumble_msg.edit(
-                                        content=f"> Unreacted rumble via emoji from {guild_name} ({channel_name}):\n> {messages.jump_url}"
-                                    )
-                                    await reaction.remove(client.user)
-                                    break
+                            if action == "check_msg":
+                                await rumble_msg.edit(
+                                    content=f"> Unreacted rumble via 'yes' from {guild_name} ({channel_name}):\n> {messages.jump_url}"
+                                )
+                                await reaction.remove(client.user)
+                                break
 
-                                elif action == "msg_scanner":
-                                    await target_channel.send(
-                                        f"> Potential fake rumble on {guild_name} ({channel_name}):\n> {messages.jump_url} <@&961002892897185862>"
-                                    )
+                            elif action == "check_reaction_remove":
+                                await rumble_msg.edit(
+                                    content=f"> Unreacted rumble via emoji from {guild_name} ({channel_name}):\n> {messages.jump_url}"
+                                )
+                                await reaction.remove(client.user)
+                                break
 
-                                elif action == "check_reaction_add":
-                                    await rumble_msg.edit(
-                                        content=f"> Unreacted rumble via emoji from {guild_name} ({channel_name}):\n> {messages.jump_url}"
-                                    )
-                                    await reaction.remove(client.user)
-                                    break
+                            elif action == "msg_scanner":
+                                await target_channel.send(
+                                    f"> Potential fake rumble on {guild_name} ({channel_name}):\n> {messages.jump_url} <@&961002892897185862>"
+                                )
 
-                    except:
-                        pass
+                            elif action == "check_reaction_add":
+                                await rumble_msg.edit(
+                                    content=f"> Unreacted rumble via emoji from {guild_name} ({channel_name}):\n> {messages.jump_url}"
+                                )
+                                await reaction.remove(client.user)
+                                break
+
+                except:
+                    pass
 
 
 @client.event
