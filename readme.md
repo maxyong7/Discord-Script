@@ -1,6 +1,6 @@
 ## Discord Script
-> Utilizing PostGreSQL, Heroku, Discord API, Python, JSON, SQLite3
-> 
+- Utilized: ```PostGreSQL, Heroku, Discord API, Python, JSON, SQLite3```
+ 
 
 Functionality:
 > 1. **React** to giveaways and **notify** the user
